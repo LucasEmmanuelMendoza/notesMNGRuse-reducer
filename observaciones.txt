@@ -1,0 +1,33 @@
+-La lógica de javascript va adentro de llaves.
+-JSX revuelve UN solo elemento.
+-Practicar ambos retornos de un componente:
+    1)Return explícito: export const Note = ({content}) =>{
+        return(
+            <div>
+                ...
+            </div>            
+        )
+    }
+    2)Return implícito: export const Note = ({content}) => (
+        <div>
+            ...
+        </div>
+    )
+    
+-EJEMPLO Props:
+export const Note = ({ title, text }) => (
+    <div>
+        <h1>{title}</h1>
+        <p>{text}</p>
+    </div>
+);
+
+import { Note } from "./Note";
+
+export const NotesContainer = ({ notes }) => (
+    <div>
+        {notes.map((note) => (
+            <Note key={note.id} title={note.title} text={note.text} />
+        ))}
+    </div>
+);
