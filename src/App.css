@@ -1,11 +1,19 @@
 #root {
+  background-color: black;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
 }
 
+body {
+  background-color: black !important;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
 .mainView {
-  width: 85vh;
+  width: 95vh;
   height: 55vh;
   max-width: none;
 }
