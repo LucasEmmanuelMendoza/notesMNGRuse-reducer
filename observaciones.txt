@@ -31,3 +31,14 @@ export const NotesContainer = ({ notes }) => (
         ))}
     </div>
 );
+
+-Al pasar los componentes de la single page a varias funciones e importando el dispatch del contexto,
+Voy a poder declarar, por ejemplo, en Note, las funciones de deleteNote, editNote, 
+selectNote, etc, sin tener que declararla en el componente padre, pasarla a
+notesContainer, después a cada Note y recién ahí usarla.
+
+-Linea 283: 
+    /*Error: La función InputNote está definida dentro del componente NotesManager, y accede 
+    directamente a state.inputTitle y state.inputText. Pero React no permite que un componente
+    acceda a props que no se le pasaron. Como InputNote está usando state.inputTitle directamente,
+    debería apsarle esas props también si quiero que sea reutilizable. */

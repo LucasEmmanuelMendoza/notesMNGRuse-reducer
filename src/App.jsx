@@ -11,7 +11,7 @@ const Button = ({ content, handleClick, className }) => (
   </button>
 );
 
-const Note = ({ title, text, onEdit, onDelete }) => {
+const Note = ({ title, text, onEdit, onDelete, onSelect }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -20,7 +20,7 @@ const Note = ({ title, text, onEdit, onDelete }) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="d-flex gap-2 align-items-center ms-2">
+      <div onClick={onSelect} className="d-flex gap-2 align-items-center ms-2">
         <h3>{title}</h3>
         {text.length > 5 ? <>{text.slice(5)}...</> : <span>{text}</span>}
       </div>
@@ -44,7 +44,7 @@ const Note = ({ title, text, onEdit, onDelete }) => {
   );
 };
 
-const NotesContainer = ({ notes, onDeleteNote, onEditNote }) => {
+const NotesContainer = ({ notes, onDeleteNote, onEditNote, onSelectNote }) => {
   return (
     <div className="d-flex flex-column gap-1">
       {notes.map((note) => (
@@ -54,8 +54,18 @@ const NotesContainer = ({ notes, onDeleteNote, onEditNote }) => {
           text={note.text}
           onEdit={() => onEditNote(note.id)}
           onDelete={() => onDeleteNote(note.id)}
+          onSelect={() => onSelectNote(note.id)}
         />
       ))}
+    </div>
+  );
+};
+
+const NoteView = ({ title, text }) => {
+  return (
+    <div>
+      <h2>{title}</h2>
+      <p>{text}</p>
     </div>
   );
 };
@@ -73,6 +83,7 @@ function NotesManager() {
     inputText: "",
     idSelectedNote: null,
     idEditingNote: null,
+    selectedNote: {},
   };
 
   const reducer = (state, action) => {
@@ -87,11 +98,13 @@ function NotesManager() {
         if (state.inputTitle !== "" && state.inputText !== "") {
           return {
             ...state,
+            id: `${state.id + 1}`,
             inputTitle: "",
             inputText: "",
             notes: [
               ...state.notes,
               {
+                id: `${state.id + 1}`,
                 title: `${state.inputTitle}`,
                 text: `${state.inputText}`,
               },
@@ -107,25 +120,29 @@ function NotesManager() {
           inputTitle: "",
           inputText: "",
           idEditingNote: null,
+          idSelectedNote: null,
         };
 
       case "DELETE_NOTE":
         const filteredNotes = state.notes.filter(
           (note) => note.id != action.value
         );
-        /*         if (action.value === state.idSelectedNote) {
+        if (action.value === state.idSelectedNote) {
           return {
             ...state,
             idSelectedNote: null,
+            inputTitle: "",
+            inputText: "",
+            notes: filteredNotes,
           };
-        } */
+        }
         if (action.value === state.idEditingNote) {
           return {
             ...state,
             inputTitle: "",
             inputText: "",
-            idEditingNote: null,
             notes: filteredNotes,
+            idEditingNote: null,
           };
         }
         return {
@@ -151,6 +168,7 @@ function NotesManager() {
               idEditingNote: null,
               title: state.inputTitle,
               text: state.inputText,
+              idSelectedNote: null,
             };
           } else {
             return note;
@@ -161,9 +179,60 @@ function NotesManager() {
           ...state,
           notes: moddedNotes,
         };
+
+      case "SELECT_NOTE":
+        const foundNote = state.notes.find((note) => note.id === action.value);
+        return {
+          ...state,
+          idEditingNote: null,
+          idSelectedNote: action.value,
+          selectedNote: foundNote,
+        };
     }
   };
   const [state, dispatch] = useReducer(reducer, initialState);
+
+  const handleChange = (e) => {
+    dispatch({
+      type: "UPDATE_FIELD",
+      field: e.target.name,
+      value: e.target.value,
+    });
+  };
+
+  const InputNote = ({ changeFunction }) => {
+    return (
+      <div>
+        <div className="mb-3">
+          <input
+            type="text"
+            name="inputTitle"
+            value={state.inputTitle}
+            placeholder="Write a Title"
+            onChange={changeFunction}
+            className="form-control"
+          />
+        </div>
+        <div className="mb-3">
+          <textarea
+            name="inputText"
+            value={state.inputText}
+            placeholder="Write a Note"
+            onChange={changeFunction}
+            className="form-control"
+            rows={10}
+          />
+        </div>
+      </div>
+    );
+  };
+
+  const handleSelectNote = (id) => {
+    dispatch({
+      type: "SELECT_NOTE",
+      value: id,
+    });
+  };
 
   const handleDeleteNote = (id) => {
     dispatch({
@@ -179,11 +248,15 @@ function NotesManager() {
     });
   };
 
-  const handleChange = (e) => {
+  const handleAddNote = () => {
     dispatch({
-      type: "UPDATE_FIELD",
-      field: e.target.name,
-      value: e.target.value,
+      type: "ADD_NOTE",
+    });
+  };
+
+  const handleSaveNote = () => {
+    dispatch({
+      type: "UPDATE_NOTE",
     });
   };
 
@@ -192,49 +265,67 @@ function NotesManager() {
       <h1>Notes Manager</h1>
       <Row>
         <Col md={7}>
-          <>
-            <div className="mb-3">
-              <input
-                type="text"
-                name="inputTitle"
-                value={state.inputTitle}
-                placeholder="Write a Title"
-                onChange={handleChange}
-                className="form-control"
-              />
-            </div>
-            <div className="mb-3">
-              <textarea
-                type="text"
-                name="inputText"
-                placeholder="Write a Note"
-                value={state.inputText}
-                onChange={handleChange}
-                className="form-control"
-                rows={4}
-              />
-            </div>
-          </>
+          {(() => {
+            let content;
+            let actionButton;
 
-          {state.idEditingNote !== null ? (
-            <Button
-              content="Save Note"
-              handleClick={() =>
-                dispatch({
-                  type: "UPDATE_NOTE",
-                })
-              }
-            />
-          ) : (
-            <Button
-              content="Add Note"
-              handleClick={() =>
-                dispatch({
-                  type: "ADD_NOTE",
-                })
-              }
-            />
-          )}
+            // Si hay una nota seleccionada y NO se está editando => mostrar solo la nota
+            if (state.idSelectedNote !== null && state.idEditingNote === null) {
+              content = (
+                <div>
+                  <h2>{state.selectedNote.title}</h2>
+                  <p>{state.selectedNote.text}</p>
+                </div>
+              );
+
+              actionButton = null;
+            } else {
+              // content = <InputNote changeFunction={handleChange} />;
+              content = (
+                <div>
+                  <div className="mb-3">
+                    <input
+                      type="text"
+                      name="inputTitle"
+                      value={state.inputTitle}
+                      placeholder="Write a Title"
+                      onChange={handleChange}
+                      className="form-control"
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <textarea
+                      name="inputText"
+                      value={state.inputText}
+                      placeholder="Write a Note"
+                      onChange={handleChange}
+                      className="form-control"
+                      rows={10}
+                    />
+                  </div>
+                </div>
+              );
+
+              actionButton =
+                state.idEditingNote !== null ? (
+                  <Button
+                    content="Save Note"
+                    handleClick={() => handleSaveNote()}
+                  />
+                ) : (
+                  <Button
+                    content="Add Note"
+                    handleClick={() => handleAddNote()}
+                  />
+                );
+            }
+            return (
+              <>
+                {content}
+                {actionButton}
+              </>
+            );
+          })()}
         </Col>
 
         <Col md={5} className="d-flex flex-column">
@@ -251,6 +342,7 @@ function NotesManager() {
               notes={state.notes}
               onDeleteNote={handleDeleteNote}
               onEditNote={handleEditNote}
+              onSelectNote={handleSelectNote}
             />
           </div>
         </Col>
