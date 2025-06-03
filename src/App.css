@@ -1,8 +1,14 @@
 #root {
-  background-color: black;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+}
+.form-control{
+  resize: none;
+}
+.notesContainer {
+  height: 15rem;
+  overflow-y: auto;
 }
 
 body {
