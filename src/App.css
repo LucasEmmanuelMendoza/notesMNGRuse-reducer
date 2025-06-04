@@ -1,8 +1,26 @@
 #root {
-  background-color: black;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+}
+
+.note {
+  height: 3rem;
+}
+
+.notesContainer {
+  width: 18rem;
+}
+
+.form-control {
+  overflow: auto;
+  resize: none;
+}
+.notesContainer {
+  width: 19.5rem;
+  scrollbar-gutter: thin;
+  height: 15rem;
+  overflow-y: auto;
 }
 
 body {
@@ -13,7 +31,7 @@ body {
 }
 
 .mainView {
-  width: 95vh;
+  width: 100vh;
   height: 55vh;
   max-width: none;
 }

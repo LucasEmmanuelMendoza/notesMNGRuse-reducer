@@ -16,26 +16,26 @@ const Note = ({ title, text, onEdit, onDelete, onSelect }) => {
 
   return (
     <div
-      className="border border-white d-flex gap-2 p-2 justify-content-between align-items-center"
+      className="note border border-white d-flex gap-2 p-2 justify-content-between align-items-center"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div onClick={onSelect} className="d-flex gap-2 align-items-center ms-2">
-        <h3>{title}</h3>
-        {text.length > 5 ? <>{text.slice(5)}...</> : <span>{text}</span>}
+        <h4>{title}</h4>
+        {text.length > 5 ? <>{text.slice(0, 5)}...</> : <>{text}</>}
       </div>
-      <div className="me-2 d-flex gap-1">
+      <div className="me-1 d-flex gap-1">
         {isHovered && (
           <Button
             content={"✏️"}
-            className="btn btn-warning"
+            className="btn btn-warning btnEdit"
             handleClick={onEdit}
           />
         )}
         {isHovered && (
           <Button
             content={"❌"}
-            className="btn btn-danger"
+            className="btn btn-danger btnDelete"
             handleClick={onDelete}
           />
         )}
@@ -46,7 +46,7 @@ const Note = ({ title, text, onEdit, onDelete, onSelect }) => {
 
 const NotesContainer = ({ notes, onDeleteNote, onEditNote, onSelectNote }) => {
   return (
-    <div className="d-flex flex-column gap-1">
+    <div className="d-flex flex-column gap-1 notesContainer border border-white">
       {notes.map((note) => (
         <Note
           key={note.id}
@@ -76,7 +76,6 @@ function NotesManager() {
     notes: [
       { id: 1, title: "asd", text: "a" },
       { id: 2, title: "hola", text: "lucas" },
-      { id: 3, title: "asdasdasd", text: "asdasdsad" },
       { id: 4, title: "si", text: "hola buenas" },
     ],
     inputTitle: "",
@@ -95,7 +94,7 @@ function NotesManager() {
         };
 
       case "ADD_NOTE":
-        if (state.inputTitle !== "" && state.inputText !== "") {
+        if (state.inputTitle.trim() !== "" && state.inputText.trim() !== "") {
           return {
             ...state,
             id: `${state.id + 1}`,
@@ -200,33 +199,6 @@ function NotesManager() {
     });
   };
 
-  const InputNote = ({ changeFunction }) => {
-    return (
-      <div>
-        <div className="mb-3">
-          <input
-            type="text"
-            name="inputTitle"
-            value={state.inputTitle}
-            placeholder="Write a Title"
-            onChange={changeFunction}
-            className="form-control"
-          />
-        </div>
-        <div className="mb-3">
-          <textarea
-            name="inputText"
-            value={state.inputText}
-            placeholder="Write a Note"
-            onChange={changeFunction}
-            className="form-control"
-            rows={10}
-          />
-        </div>
-      </div>
-    );
-  };
-
   const handleSelectNote = (id) => {
     dispatch({
       type: "SELECT_NOTE",
@@ -299,6 +271,7 @@ function NotesManager() {
                       placeholder="Write a Title"
                       onChange={handleChange}
                       className="form-control"
+                      maxLength={6}
                     />
                   </div>
                   <div className="mb-3">
@@ -345,14 +318,12 @@ function NotesManager() {
               content="+"
             />
           </div>
-          <div className="flex-grow-1 overflow-auto">
-            <NotesContainer
-              notes={state.notes}
-              onDeleteNote={handleDeleteNote}
-              onEditNote={handleEditNote}
-              onSelectNote={handleSelectNote}
-            />
-          </div>
+          <NotesContainer
+            notes={state.notes}
+            onDeleteNote={handleDeleteNote}
+            onEditNote={handleEditNote}
+            onSelectNote={handleSelectNote}
+          />
         </Col>
       </Row>
     </div>
