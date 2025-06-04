@@ -265,6 +265,10 @@ function NotesManager() {
       <h1>Notes Manager</h1>
       <Row>
         <Col md={7}>
+          {/* Esto se llama una Immediately Invoked Function Expression (IIFE) dentro de JSX. 
+          Es decir, una función flecha que se ejecuta al instante. La usamos así dentro de JSX 
+          cuando queremos meter bloques de lógica compleja que normalmente no se pueden usar 
+          directamente en JSX, como un if con varias ramas. */}
           {(() => {
             let content;
             let actionButton;
@@ -281,6 +285,10 @@ function NotesManager() {
               actionButton = null;
             } else {
               // content = <InputNote changeFunction={handleChange} />;
+              /*Error: La función InputNote está definida dentro del componente NotesManager, y accede 
+              directamente a state.inputTitle y state.inputText. Pero React no permite que un componente
+              acceda a props que no se le pasaron. Como InputNote está usando state.inputTitle directamente,
+              debería apsarle esas props también si quiero que sea reutilizable. */
               content = (
                 <div>
                   <div className="mb-3">
