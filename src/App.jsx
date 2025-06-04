@@ -16,26 +16,26 @@ const Note = ({ title, text, onEdit, onDelete, onSelect }) => {
 
   return (
     <div
-      className="border border-white d-flex gap-2 p-2 justify-content-between align-items-center"
+      className="note border border-white d-flex gap-2 p-2 justify-content-between align-items-center"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div onClick={onSelect} className="d-flex gap-2 align-items-center ms-2">
-        <h3>{title}</h3>
+        <h4>{title}</h4>
         {text.length > 5 ? <>{text.slice(0, 5)}...</> : <>{text}</>}
       </div>
-      <div className="me-2 d-flex gap-1">
+      <div className="me-1 d-flex gap-1">
         {isHovered && (
           <Button
             content={"✏️"}
-            className="btn btn-warning"
+            className="btn btn-warning btnEdit"
             handleClick={onEdit}
           />
         )}
         {isHovered && (
           <Button
             content={"❌"}
-            className="btn btn-danger"
+            className="btn btn-danger btnDelete"
             handleClick={onDelete}
           />
         )}
