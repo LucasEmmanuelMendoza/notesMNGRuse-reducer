@@ -8,17 +8,14 @@
   height: 3rem;
 }
 
-.notesContainer {
-  width: 18rem;
-}
-
 .form-control {
   overflow: auto;
   resize: none;
 }
+
 .notesContainer {
-  width: 19.5rem;
-  scrollbar-gutter: thin;
+  width: 20rem;
+  scrollbar-gutter: stable;
   height: 15rem;
   overflow-y: auto;
 }
